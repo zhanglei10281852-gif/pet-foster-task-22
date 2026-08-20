@@ -71,17 +71,6 @@ type OrderService struct {
 	Subtotal  float64 `json:"subtotal"`
 }
 
-func normalizeOrderServices(items []OrderService) []OrderService {
-	result := make([]OrderService, 0, len(items))
-	for _, item := range items {
-		if item.Quantity < 1 {
-			item.Quantity = 1
-		}
-		result = append(result, item)
-	}
-	return result
-}
-
 type FosterOrder struct {
 	ID             int64          `json:"orderId"`
 	OrderNo        string         `json:"orderNo"`

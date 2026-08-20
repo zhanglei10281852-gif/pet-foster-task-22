@@ -67,9 +67,17 @@ func (s *Service) CreateOrder(ctx context.Context, principal Principal, input Cr
 	}
 	total := price * days
 	serviceRows := make([]OrderService, 0, len(input.Services))
-	for _, selected := range normalizeOrderServices(input.Services) {
+	seenServices := make(map[int64]struct{}, len(input.Services))
+	for _, selected := range input.Services {
 		if selected.ServiceID == 0 {
 			return FosterOrder{}, fmt.Errorf("%w: service id is required", ErrValidation)
+		}
+		if _, exists := seenServices[selected.ServiceID]; exists {
+			return FosterOrder{}, fmt.Errorf("%w: duplicate service selection", ErrValidation)
+		}
+		seenServices[selected.ServiceID] = struct{}{}
+		if selected.Quantity < 1 {
+			selected.Quantity = 1
 		}
 		var servicePrice float64
 		var active int
